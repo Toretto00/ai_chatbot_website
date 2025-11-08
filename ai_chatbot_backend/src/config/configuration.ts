@@ -13,4 +13,9 @@ export default () => ({
     name: process.env.DB_NAME ?? '',
     ssl: process.env.DB_SSL === 'true',
   },
+  jwt: {
+    secret: process.env.JWT_SECRET ?? '',
+    accessTokenExpried:
+      parseInt(process.env.JWT_ACCESS_TOKEN_EXPRIED ?? '', 10) || 3600,
+  },
 });

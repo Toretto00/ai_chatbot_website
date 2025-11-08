@@ -8,7 +8,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration from './config/configuration';
 
 import { UsersModule } from './modules/users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -33,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     // Users Module
     UsersModule,
+    // Auth Module
     AuthModule,
   ],
   controllers: [AppController],
