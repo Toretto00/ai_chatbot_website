@@ -14,6 +14,12 @@ importers:
       '@nestjs/passport':
         specifier: ^11.0.5
         version: 11.0.5(@nestjs/common@11.1.8(reflect-metadata@0.2.2)(rxjs@7.8.2))(passport@0.7.0)
+      '@types/uuid':
+        specifier: ^11.0.0
+        version: 11.0.0
+      dayjs:
+        specifier: ^1.11.19
+        version: 1.11.19
       passport:
         specifier: ^0.7.0
         version: 0.7.0
@@ -23,6 +29,9 @@ importers:
       passport-local:
         specifier: ^1.0.0
         version: 1.0.0
+      uuid:
+        specifier: ^13.0.0
+        version: 13.0.0
     devDependencies:
       '@types/passport-jwt':
         specifier: ^4.0.1
@@ -119,8 +128,15 @@ packages:
   '@types/serve-static@1.15.10':
     resolution: {integrity: sha512-tRs1dB+g8Itk72rlSI2ZrW6vZg0YrLI81iQSTkMmOqnqCaNr/8Ek4VwWcN5vZgCYWbg/JJSGBlUaYGAOP73qBw==}
 
+  '@types/uuid@11.0.0':
+    resolution: {integrity: sha512-HVyk8nj2m+jcFRNazzqyVKiZezyhDKrGUA3jlEcg/nZ6Ms+qHwocba1Y/AaVaznJTAM9xpdFSh+ptbNrhOGvZA==}
+    deprecated: This is a stub types definition. uuid provides its own type definitions, so you do not need this installed.
+
   buffer-equal-constant-time@1.0.1:
     resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
+
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -244,6 +260,10 @@ packages:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
 
+  uuid@13.0.0:
+    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
+    hasBin: true
+
 snapshots:
 
   '@borewit/text-codec@0.1.1': {}
@@ -353,7 +373,13 @@ snapshots:
       '@types/node': 24.10.0
       '@types/send': 0.17.6
 
+  '@types/uuid@11.0.0':
+    dependencies:
+      uuid: 13.0.0
+
   buffer-equal-constant-time@1.0.1: {}
+
+  dayjs@1.11.19: {}
 
   debug@4.4.3:
     dependencies:
@@ -470,3 +496,5 @@ snapshots:
   undici-types@7.16.0: {}
 
   utils-merge@1.0.1: {}
+
+  uuid@13.0.0: {}

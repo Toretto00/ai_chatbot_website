@@ -7,6 +7,9 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hashPasswordHelper } from '@/helpers/util';
 import aqp from 'api-query-params';
+import { CreateAuthDto } from '@auth/dto/create-auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class UsersService {
@@ -193,5 +196,30 @@ export class UsersService {
         statusCode: 500,
       };
     }
+  }
+
+  async register(registerDto: CreateAuthDto) {
+    const { email, password, name } = registerDto;
+
+    const isEmailExists = await this.isEmailExists(email);
+    if (isEmailExists) {
+      throw new BadRequestException(`Email ${email} already exists`);
+    }
+
+    const hashedPassword = await hashPasswordHelper(password);
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      name,
+      is_active: false,
+      code_id: uuidv4(),
+      code_expire: dayjs().add(1, 'day'),
+    });
+    await this.userRepository.save(user);
+    return {
+      message: 'User created successfully',
+      id: user.id,
+      statusCode: 201,
+    };
   }
 }
