@@ -18,4 +18,10 @@ export default () => ({
     accessTokenExpried:
       parseInt(process.env.JWT_ACCESS_TOKEN_EXPRIED ?? '', 10) || 3600,
   },
+  mail: {
+    mail_host: process.env.MAIL_HOST ?? '',
+    mail_port: parseInt(process.env.MAIL_PORT ?? '', 10) || 465,
+    mail_username: process.env.MAIL_USERNAME ?? '',
+    mail_password: process.env.MAIL_PASSWORD ?? '',
+  },
 });
