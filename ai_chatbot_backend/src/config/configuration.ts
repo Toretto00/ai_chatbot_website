@@ -24,4 +24,11 @@ export default () => ({
     mail_username: process.env.MAIL_USERNAME ?? '',
     mail_password: process.env.MAIL_PASSWORD ?? '',
   },
+  ai: {
+    provider: process.env.AI_PROVIDER ?? 'gemini',
+    gemini: {
+      apiKey: process.env.GEMINI_API_KEY ?? '',
+      model: process.env.GEMINI_MODEL ?? 'gemini-pro',
+    },
+  },
 });

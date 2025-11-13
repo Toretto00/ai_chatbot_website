@@ -4,7 +4,9 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Conversation } from '../../chat/entities/conversation.entity';
 
 @Entity('users')
 export class User {
@@ -58,4 +60,7 @@ export class User {
 
   @Column({ nullable: true })
   code_expire: Date;
+
+  @OneToMany(() => Conversation, (conversation) => conversation.user)
+  conversations: Conversation[];
 }

@@ -9,6 +9,7 @@ import configuration from './config/configuration';
 
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { ChatModule } from './modules/chat/chat.module';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -40,6 +41,8 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     UsersModule,
     // Auth Module
     AuthModule,
+    // Chat Module
+    ChatModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
