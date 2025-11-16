@@ -16,17 +16,49 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { useState } from "react";
+import { authenticate } from "@/lib/actions";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: validate + call your auth API
-    router.push("/dashboard");
+    setError(null);
+    setIsLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const result = await authenticate(email, password);
+
+      console.log(result);
+
+      if (result.status === 401) {
+        setError("Invalid email or password");
+        return;
+      } else if (result.status === 400) {
+        router.push("verify-email");
+        return;
+      }
+
+      if (result?.ok) {
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      console.log(err);
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,6 +73,13 @@ export function LoginForm({
         <CardContent>
           <form onSubmit={handleLogin}>
             <FieldGroup>
+              {error && (
+                <Field>
+                  <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+                    {error}
+                  </div>
+                </Field>
+              )}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -48,6 +87,8 @@ export function LoginForm({
                   type="email"
                   placeholder="m@example.com"
                   required
+                  name="email"
+                  disabled={isLoading}
                 />
               </Field>
               <Field>
@@ -60,10 +101,18 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  name="password"
+                  disabled={isLoading}
+                />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Signing in..." : "Login"}
+                </Button>
                 {/* <Button variant="outline" type="button">
                   Login with Google
                 </Button> */}

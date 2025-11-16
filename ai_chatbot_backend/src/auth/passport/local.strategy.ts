@@ -16,12 +16,19 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(username: string, password: string): Promise<any> {
     const user = await this.authService.validateUser(username, password);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({
+        statusCode: 401,
+        code: 'INVALID_CREDENTIALS',
+        message: 'Email or password is incorrect',
+      });
     }
     if (!user.is_active) {
-      throw new BadRequestException(
-        'Your account is not active, please check your email for activation',
-      );
+      throw new BadRequestException({
+        statusCode: 400,
+        code: 'ACCOUNT_NOT_ACTIVE',
+        message:
+          'Your account is not active, please check your email for activation',
+      });
     }
     return user;
   }
