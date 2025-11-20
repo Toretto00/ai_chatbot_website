@@ -1,10 +1,11 @@
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { sendRequest } from "./lib/apis";
+import { sendRequest } from "./utils/apis";
 import {
   AccountNotActiveError,
   InvalidEmailOrPasswordError,
-} from "./lib/errors";
+} from "./utils/errors";
+import { redirect } from "next/navigation";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -24,17 +25,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
           });
 
-          if (!res.user) {
-            if (res.status === 401) {
+          switch (res.statusCode) {
+            case 201:
+              return res.data.user;
+            case 401:
               throw new InvalidEmailOrPasswordError();
-            } else if (res.status === 400) {
+            case 400:
               throw new AccountNotActiveError();
-            } else {
+            default:
               throw new Error("An unexpected error occurred");
-            }
           }
-
-          return res.user;
         } catch (error) {
           throw error;
         }
@@ -43,5 +43,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   pages: {
     signIn: "/auth/login",
+  },
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        // User is available during sign-in
+        token.user = user as any;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (token.user) {
+        session.user = token.user as any;
+      }
+      return session;
+    },
+    authorized: async ({ auth }) => {
+      // Logged in users are authenticated, otherwise redirect to login page
+      return !!auth;
+    },
   },
 });

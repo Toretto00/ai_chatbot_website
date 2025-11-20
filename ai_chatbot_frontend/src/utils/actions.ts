@@ -10,9 +10,12 @@ export async function authenticate(email: string, password: string) {
       redirect: false,
     });
 
-    return result;
+    return {
+      status: 200,
+      code: "SUCCESS",
+      message: "Login successful",
+    };
   } catch (error) {
-    console.log(JSON.stringify(error));
     if ((error as any).type === "INVALID_EMAIL_OR_PASSWORD") {
       return {
         status: 401,

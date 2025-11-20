@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { authenticate } from "@/lib/actions";
+import { authenticate } from "@/utils/actions";
 
 export function LoginForm({
   className,
@@ -40,18 +40,12 @@ export function LoginForm({
     try {
       const result = await authenticate(email, password);
 
-      console.log(result);
-
-      if (result.status === 401) {
-        setError("Invalid email or password");
-        return;
-      } else if (result.status === 400) {
-        router.push("verify-email");
-        return;
-      }
-
-      if (result?.ok) {
+      if (result.status === 201) {
         router.push("/dashboard");
+        return;
+      } else {
+        setError(result.message);
+        return;
       }
     } catch (err) {
       console.log(err);
