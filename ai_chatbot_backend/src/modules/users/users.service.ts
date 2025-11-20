@@ -5,9 +5,9 @@ import { User } from './entities/user.entity';
 
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { hashPasswordHelper } from '@/helpers/util';
+import { hashPasswordHelper } from '../../helpers/util';
 import aqp from 'api-query-params';
-import { CodeAuthDto, CreateAuthDto } from '@auth/dto/create-auth.dto';
+import { CodeAuthDto, CreateAuthDto } from '../../auth/dto/create-auth.dto';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 

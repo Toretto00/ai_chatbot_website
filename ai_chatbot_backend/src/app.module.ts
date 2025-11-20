@@ -15,7 +15,7 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { TransformInterceptor } from '@core/transform.interceptor';
+import { TransformInterceptor } from './core/transform.interceptor';
 
 @Module({
   imports: [

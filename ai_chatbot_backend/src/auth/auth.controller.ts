@@ -15,7 +15,7 @@ import { LoginDto } from './dto/login.dto';
 import { Request } from '@nestjs/common';
 import { LocalAuthGuard } from './passport/local-auth.guard';
 import { JwtAuthGuard } from './passport/jwt-auth.guard';
-import { Public, ResponseMessage } from '@decorator/customize';
+import { Public, ResponseMessage } from '../decorator/customize';
 import { MailerService } from '@nestjs-modules/mailer';
 
 @Controller('auth')

@@ -1,10 +1,3 @@
-import * as moduleAlias from 'module-alias';
-import * as path from 'path';
-
-moduleAlias.addAliases({
-  '@': path.join(__dirname, './'),
-});
-
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
