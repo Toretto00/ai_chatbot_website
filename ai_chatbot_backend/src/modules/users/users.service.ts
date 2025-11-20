@@ -7,8 +7,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { hashPasswordHelper } from '@/helpers/util';
 import aqp from 'api-query-params';
-import { CreateAuthDto } from '@auth/dto/create-auth.dto';
-import { v4 as uuidv4 } from 'uuid';
+import { CodeAuthDto, CreateAuthDto } from '@auth/dto/create-auth.dto';
 import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 
@@ -209,7 +208,11 @@ export class UsersService {
     }
 
     const hashedPassword = await hashPasswordHelper(password);
-    const code_id = uuidv4();
+
+    const code_id = String(Math.floor(Math.random() * 1000000)).padStart(
+      6,
+      '0',
+    );
     const user = this.userRepository.create({
       email,
       password: hashedPassword,
@@ -237,6 +240,26 @@ export class UsersService {
       message: 'User created successfully',
       id: user.id,
       statusCode: 201,
+    };
+  }
+
+  async handleActivateAccount(verifyEmailDto: CodeAuthDto) {
+    const { user_id, code } = verifyEmailDto;
+    const user = await this.userRepository.findOne({ where: { id: user_id } });
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    if (user.code_id !== code) {
+      throw new BadRequestException('Invalid code');
+    }
+    if (user.code_expire.getTime() < dayjs().toDate().getTime()) {
+      throw new BadRequestException('Code expired');
+    }
+    await this.userRepository.update(user_id, { is_active: true });
+    return {
+      message: 'Account activated successfully',
+      statusCode: 200,
+      data: user.id,
     };
   }
 }

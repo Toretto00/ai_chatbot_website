@@ -15,6 +15,13 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1', { exclude: ['/'] });
 
+  app.enableCors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
+
   await app.listen(configService.get('PORT') ?? 8080);
 }
 bootstrap();

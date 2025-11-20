@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
+import { CodeAuthDto, CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginDto } from './dto/login.dto';
 import { Request } from '@nestjs/common';
@@ -35,8 +35,16 @@ export class AuthController {
 
   @Post('register')
   @Public()
+  @ResponseMessage('Register')
   register(@Body() registerDto: CreateAuthDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Post('verify-email')
+  @Public()
+  @ResponseMessage('Verify Email')
+  verifyEmail(@Body() verifyEmailDto: CodeAuthDto) {
+    return this.authService.verifyEmail(verifyEmailDto);
   }
 
   @Get('send-email')
