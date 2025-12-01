@@ -27,7 +27,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           switch (res.statusCode) {
             case 201:
-              return res.data.user;
+              return {
+                ...res.data.user,
+                accessToken: res.data.access_token,
+              };
             case 401:
               throw new InvalidEmailOrPasswordError();
             case 400:

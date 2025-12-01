@@ -5,12 +5,12 @@ import {
   Delete,
   Body,
   Param,
-  Sse,
-  MessageEvent,
   Req,
+  Res,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
+import type { Response } from 'express';
 import { ChatService } from './chat.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { CreateConversationDto } from './dto/create-conversation.dto';
@@ -58,35 +58,50 @@ export class ChatController {
     return this.chatService.deleteConversation(conversationId, req.user.userId);
   }
 
-  // Stream chat messages (Server-Sent Events)
-  @Sse('stream')
+  // Stream chat messages (chunked)
+  @Post('stream')
   async streamMessage(
     @Req() req,
     @Body() createMessageDto: CreateMessageDto,
-  ): Promise<Observable<MessageEvent>> {
+    @Res() res: Response,
+  ): Promise<void> {
     const { conversationId, message } = createMessageDto;
 
     if (!conversationId) {
-      throw new Error('conversationId is required');
+      throw new BadRequestException('conversationId is required');
     }
 
-    return new Observable((subscriber) => {
-      (async () => {
-        try {
-          for await (const chunk of this.chatService.streamResponse(
-            conversationId,
-            message,
-            req.user.userId,
-          )) {
-            subscriber.next({
-              data: { content: chunk },
-            } as MessageEvent);
-          }
-          subscriber.complete();
-        } catch (error) {
-          subscriber.error(error);
-        }
-      })();
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    (res as any).flushHeaders?.();
+
+    let clientClosed = false;
+    req.on('close', () => {
+      clientClosed = true;
     });
+
+    const pushChunk = (payload: object) => {
+      res.write(`data: ${JSON.stringify(payload)}\n\n`);
+      (res as any).flush?.();
+    };
+
+    try {
+      for await (const chunk of this.chatService.streamResponse(
+        conversationId,
+        message,
+        req.user.userId,
+      )) {
+        if (clientClosed) break;
+        pushChunk({ content: chunk });
+      }
+      pushChunk({ done: true });
+    } catch (error) {
+      pushChunk({
+        error: error instanceof Error ? error.message : 'Stream error',
+      });
+    } finally {
+      res.end();
+    }
   }
 }

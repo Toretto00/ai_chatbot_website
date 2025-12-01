@@ -1,9 +1,9 @@
-import DashboardPage from "@/app/dashboard/page";
+import ChatPage from "@/app/chat/page";
 
 export default function Home() {
   return (
     <div>
-      <DashboardPage />
+      <ChatPage />
     </div>
   );
 }

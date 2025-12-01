@@ -39,7 +39,7 @@ export function LoginForm({
       const result = await authenticate(email, password);
 
       if (result.status === 200) {
-        router.push("/dashboard");
+        router.push("/chat");
         return;
       } else {
         toast.error(result.message);
