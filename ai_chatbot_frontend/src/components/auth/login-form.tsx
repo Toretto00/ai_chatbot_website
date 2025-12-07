@@ -19,12 +19,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authenticate } from "@/utils/actions";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
+  const { update } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -39,7 +41,10 @@ export function LoginForm({
       const result = await authenticate(email, password);
 
       if (result.status === 200) {
-        router.push("/chat");
+        // Refresh the session to get the updated session data
+        await update();
+        // Use window.location for a full page reload to ensure session is properly loaded
+        window.location.href = "/chat";
         return;
       } else {
         toast.error(result.message);
