@@ -1,7 +1,12 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { UserRole } from './enums/user-role.enum';
 
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -51,6 +56,7 @@ export class UsersService {
       name,
       phone,
       address,
+      role: UserRole.USER, // Default role is USER
     });
     await this.userRepository.save(user);
     return {
@@ -58,6 +64,131 @@ export class UsersService {
       id: user.id,
       statusCode: 201,
     };
+  }
+
+  /**
+   * Create a user with a specific role
+   * Only ADMIN users can create ADMIN users
+   * @param createUserDto - User data to create
+   * @param creatorId - ID of the user creating the new user (optional, for admin checks)
+   */
+  async createUserWithRole(
+    createUserDto: CreateUserDto,
+    creatorId?: string,
+  ): Promise<{
+    message: string;
+    id?: string;
+    statusCode: number;
+  }> {
+    const {
+      email,
+      password,
+      last_name,
+      first_name,
+      middle_name,
+      name,
+      phone,
+      address,
+      role,
+    } = createUserDto;
+
+    // Check if the requested role is ADMIN
+    if (role === UserRole.ADMIN) {
+      // If trying to create an ADMIN user, verify the creator is an ADMIN
+      if (!creatorId) {
+        throw new ForbiddenException(
+          'Only ADMIN users can create ADMIN accounts',
+        );
+      }
+
+      const creator = await this.userRepository.findOne({
+        where: { id: creatorId },
+      });
+
+      if (!creator || creator.role !== UserRole.ADMIN) {
+        throw new ForbiddenException(
+          'Only ADMIN users can create ADMIN accounts',
+        );
+      }
+    }
+
+    const isEmailExists = await this.isEmailExists(email);
+    if (isEmailExists) {
+      throw new BadRequestException(`Email ${email} already exists`);
+    }
+
+    const hashedPassword = await hashPasswordHelper(password);
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+      last_name,
+      first_name,
+      middle_name,
+      name,
+      phone,
+      address,
+      role: role || UserRole.USER, // Default to USER if no role specified
+    });
+    await this.userRepository.save(user);
+
+    return {
+      message: 'User created successfully',
+      id: user.id,
+      statusCode: 201,
+    };
+  }
+
+  /**
+   * Update user role
+   * Only ADMIN users can change roles
+   * Only ADMIN users can set role to ADMIN
+   */
+  async updateUserRole(
+    userId: string,
+    newRole: UserRole,
+    adminId: string,
+  ): Promise<{
+    message: string;
+    statusCode: number;
+  }> {
+    // Verify the requester is an ADMIN
+    const admin = await this.userRepository.findOne({
+      where: { id: adminId },
+    });
+
+    if (!admin || admin.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only ADMIN users can change user roles');
+    }
+
+    // Check if user exists
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return {
+        message: 'User not found',
+        statusCode: 404,
+      };
+    }
+
+    // Update the role
+    await this.userRepository.update(userId, { role: newRole });
+
+    return {
+      message: `User role updated to ${newRole} successfully`,
+      statusCode: 200,
+    };
+  }
+
+  /**
+   * Check if a user is an ADMIN
+   */
+  async isAdmin(userId: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+    return user?.role === UserRole.ADMIN;
   }
 
   async findAll(
@@ -220,6 +351,7 @@ export class UsersService {
       is_active: false,
       code_id,
       code_expire: dayjs().add(1, 'day'),
+      role: UserRole.USER, // Default role is USER for registration
     });
     await this.userRepository.save(user);
 

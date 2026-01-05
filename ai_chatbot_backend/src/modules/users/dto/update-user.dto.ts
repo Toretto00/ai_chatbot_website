@@ -1,26 +1,44 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsNotEmpty, IsUUID, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsUUID,
+  IsOptional,
+  IsEnum,
+  IsString,
+} from 'class-validator';
+import { UserRole } from '../enums/user-role.enum';
+
 export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsNotEmpty()
   @IsUUID()
   id: string;
 
   @IsOptional()
-  last_name: string;
+  @IsString()
+  last_name?: string;
 
   @IsOptional()
-  first_name: string;
+  @IsString()
+  first_name?: string;
 
   @IsOptional()
-  middle_name: string;
+  @IsString()
+  middle_name?: string;
 
   @IsOptional()
-  name: string;
+  @IsString()
+  name?: string;
 
   @IsOptional()
-  phone: string;
+  @IsString()
+  phone?: string;
 
   @IsOptional()
-  address: string;
+  @IsString()
+  address?: string;
+
+  @IsOptional()
+  @IsEnum(UserRole, { message: 'role must be either ADMIN or USER' })
+  role?: UserRole;
 }

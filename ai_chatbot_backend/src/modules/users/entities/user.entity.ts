@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Conversation } from '../../chat/entities/conversation.entity';
+import { UserRole } from '../enums/user-role.enum';
 
 @Entity('users')
 export class User {
@@ -49,8 +50,13 @@ export class User {
   @Column({ nullable: true })
   account_type: string;
 
-  @Column({ nullable: true })
-  role: string;
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    enumName: 'user_role_enum',
+    default: UserRole.USER,
+  })
+  role: UserRole;
 
   @Column({ default: true })
   is_active: boolean;

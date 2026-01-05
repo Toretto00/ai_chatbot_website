@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsEmail, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsEmail,
+  IsString,
+  IsOptional,
+  IsEnum,
+} from 'class-validator';
+import { UserRole } from '../enums/user-role.enum';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -9,15 +16,46 @@ export class CreateUserDto {
   @IsString()
   password: string;
 
-  last_name: string;
-  first_name: string;
-  middle_name: string;
-  name: string;
-  avatar_url: string;
-  phone: string;
-  address: string;
-  account_type: string;
-  role: string;
-  code_id: string;
-  code_expire: Date;
+  @IsOptional()
+  @IsString()
+  last_name?: string;
+
+  @IsOptional()
+  @IsString()
+  first_name?: string;
+
+  @IsOptional()
+  @IsString()
+  middle_name?: string;
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  avatar_url?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  address?: string;
+
+  @IsOptional()
+  @IsString()
+  account_type?: string;
+
+  @IsOptional()
+  @IsEnum(UserRole, { message: 'role must be either ADMIN or USER' })
+  role?: UserRole;
+
+  @IsOptional()
+  @IsString()
+  code_id?: string;
+
+  @IsOptional()
+  code_expire?: Date;
 }
